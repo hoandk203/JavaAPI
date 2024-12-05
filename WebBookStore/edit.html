@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Store</title>
+  </head>
+  <body>
+    <div style="text-align: center; margin-top: 10em">
+      <div>
+        <h1>Cập nhật</h1>
+      </div>
+      <div>
+        <h4 id="error-message"></h4>
+      </div>
+      <form action="" id="addForm">
+        <div>
+          <label for="">Tieu de: </label>
+          <input type="text" id="title" required />
+        </div>
+        <div>
+          <label for="">Tac gia: </label>
+          <input type="text" id="author" required />
+        </div>
+        <div>
+          <label for="">Ngay xuat ban: </label>
+          <input type="date" id="publishedDate" required />
+        </div>
+        <div>
+          <label for="">Gia tien: </label>
+          <input type="text" id="price" required />
+        </div>
+        <div>
+          <label for="">So luong: </label>
+          <input type="number" id="quantity" required />
+        </div>
+        <button type="submit">Cap nhat</button>
+      </form>
+    </div>
+    <script>
+      // Lấy tham số từ URL
+      const API_URL = 'http://localhost:8080/api/books';
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramId = urlParams.get('id');
+
+      // Lấy dữ liệu nhân viên để chỉnh sửa
+      fetch(`${API_URL}/${paramId}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch params data.'); // Nếu không thành công, ném ra lỗi
+          }
+          return response.json(); // Chuyển đổi dữ liệu sang định dạng JSON
+        })
+        .then((params) => {
+          // Điền dữ liệu vào các ô nhập
+          document.getElementById('title').value = params.title;
+          document.getElementById('author').value = params.author;
+          document.getElementById('publishedDate').value = params.publishedDate;
+          document.getElementById('price').value = params.price;
+          document.getElementById('quantity').value = params.quantity;
+        })
+        .catch((error) => {
+          // Hiển thị thông báo lỗi nếu có
+          document.getElementById('error-message').textContent = error.message;
+        });
+
+      document
+        .getElementById('addForm')
+        .addEventListener('submit', function (e) {
+          e.preventDefault();
+          const newElement = {
+            title: document.getElementById('title').value,
+            author: document.getElementById('author').value,
+            publishedDate: document.getElementById('publishedDate').value,
+            price: document.getElementById('price').value,
+            quantity: document.getElementById('quantity').value,
+          };
+
+          fetch(`${API_URL}/${paramId}`, {
+            method: 'PUT', // Phương thức gửi là POST
+            headers: { 'Content-Type': 'application/json' }, // Đặt tiêu đề Content-Type
+            body: JSON.stringify(newElement), // Chuyển đổi đối tượng newElement thành chuỗi JSON
+          })
+            .then((response) => {
+              if (!response.ok) {
+                // Kiểm tra xem phản hồi có thành công không
+                return response.json().then((errorData) => {
+                  // Hiển thị thông báo lỗi nếu có
+                  document.getElementById('error-message').textContent =
+                    errorData.details + '\n' + errorData.message; // Hiển thị thông điệp lỗi
+                  throw new Error(errorData.details + '\n' + errorData.message); // Ném lỗi để xử lý
+                });
+              }
+              return response.json(); // Chuyển đổi phản hồi thành JSON
+            })
+            .then(() => {
+              window.location.href = 'index.html?success=edit'; // Chuyển hướng đến trang index với thông báo thành công
+            })
+            .catch((error) => console.error('Error:', error)); // In lỗi ra console nếu có
+        });
+    </script>
+  </body>
+</html>

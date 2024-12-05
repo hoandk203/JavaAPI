@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Thêm Nhân Viên</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      input[type='text'],
+      input[type='email'] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: blue;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: darkblue;
+      }
+      .error {
+        color: red;
+        margin-top: 15px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Thêm Nhân Viên</h1>
+
+      <form id="addForm">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" required />
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required />
+        </div>
+        <button type="submit">Thêm</button>
+        <div id="error-message" class="error"></div>
+        <!-- Error message area -->
+      </form>
+    </div>
+
+    <script>
+      // Thêm sự kiện khi người dùng gửi biểu mẫu
+      document
+        .getElementById('addForm')
+        .addEventListener('submit', function (e) {
+          e.preventDefault(); // Ngăn chặn hành vi mặc định của việc gửi biểu mẫu
+
+          const newEmployee = {
+            firstName: document.getElementById('firstName').value, // Lấy giá trị từ trường Tên
+            lastName: document.getElementById('lastName').value, // Lấy giá trị từ trường Họ
+            email: document.getElementById('email').value, // Lấy giá trị từ trường Email
+          };
+
+          // Gửi dữ liệu tới API
+          fetch('http://localhost:8080/api/employees', {
+            method: 'POST', // Phương thức gửi là POST
+            headers: { 'Content-Type': 'application/json' }, // Đặt tiêu đề Content-Type
+            body: JSON.stringify(newEmployee), // Chuyển đổi đối tượng newEmployee thành chuỗi JSON
+          })
+            .then((response) => {
+              if (!response.ok) {
+                // Kiểm tra xem phản hồi có thành công không
+                return response.json().then((errorData) => {
+                  // Hiển thị thông báo lỗi nếu có
+                  document.getElementById('error-message').textContent =
+                    errorData.details + '\n' + errorData.message; // Hiển thị thông điệp lỗi
+                  throw new Error(errorData.details + '\n' + errorData.message); // Ném lỗi để xử lý
+                });
+              }
+              return response.json(); // Chuyển đổi phản hồi thành JSON
+            })
+            .then(() => {
+              window.location.href = 'index.html?success=add'; // Chuyển hướng đến trang index với thông báo thành công
+            })
+            .catch((error) => console.error('Error:', error)); // In lỗi ra console nếu có
+        });
+    </script>
+  </body>
+</html>

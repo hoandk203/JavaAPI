@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Xe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="container max-w-2xl mx-auto px-4 py-8">
+        <h2 class="text-2xl font-bold text-gray-800">Cập nhật Xe</h2>
+        <form id="updateForm">
+            <div class="p-4 md:p-5 space-y-4">
+                <div>
+                    <label for="msv" class="block mb-2 text-sm font-medium text-gray-900">Mã số
+                        sinh viên</label>
+                    <input type="text" id="msv"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400"
+                        placeholder="Mã số sinh viên..." required />
+                </div>
+                <div>
+                    <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Tên
+                        sinh viên</label>
+                    <input type="text" id="name"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400"
+                        placeholder="Tên sinh viên..." required />
+                </div>
+                <div>
+                    <label for="birthday" class="block mb-2 text-sm font-medium text-gray-900">Ngày
+                        sinh</label>
+                    <input type="date" id="birthday"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400"
+                        placeholder="Ngày sinh..." required />
+                </div>
+                <div>
+                    <label for="className" class="block mb-2 text-sm font-medium text-gray-900">Lớp
+                        học</label>
+                    <input type="text" id="className"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400"
+                        placeholder="Lớp học..." required />
+                </div>
+                <div>
+                    <label for="khoa" class="block mb-2 text-sm font-medium text-gray-900">Khoa</label>
+                    <input type="text" id="khoa"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400"
+                        placeholder="Khoa..." required />
+                </div>
+                <div id="error-message" class="text-red-500"></div>
+            </div>
+            <!-- Modal footer -->
+            <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                <button type="submit"
+                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Cập
+                    nhật</button>
+                <button type="button" onclick="window.location.href='app.html'"
+                    class="py-2.5 px-5 ms-3 text-sm font-medium text-white focus:outline-none rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-white focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-red-700 dark:bg-red-600 dark:border-red-600 dark:hover:text-white hover:bg-red-800">Trang
+                    chủ</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Lấy tham số từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const employeeId = urlParams.get('id');
+
+        // Lấy dữ liệu nhân viên để chỉnh sửa
+        fetch(`http://localhost:8080/api/students/${employeeId}`)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch employee data.'); // Nếu không thành công, ném ra lỗi
+                }
+                return response.json(); // Chuyển đổi dữ liệu sang định dạng JSON
+            })
+            .then((employee) => {
+                // Điền dữ liệu vào các ô nhập
+                document.getElementById('msv').value = employee.msv;
+                document.getElementById('name').value = employee.name;
+                document.getElementById('birthday').value = employee.birthday;
+                document.getElementById('className').value = employee.className;
+                document.getElementById('khoa').value = employee.khoa;
+            })
+            .catch((error) => {
+                // Hiển thị thông báo lỗi nếu có
+                document.getElementById('error-message').textContent = error.message;
+            });
+
+        // Xử lý sự kiện gửi form
+        document
+            .getElementById('updateForm')
+            .addEventListener('submit', function (e) {
+                e.preventDefault(); // Ngăn chặn hành động gửi form mặc định
+
+                // Tạo đối tượng nhân viên cập nhật
+                const updatedEmployee = {
+                    msv: document.getElementById('msv').value,
+                    name: document.getElementById('name').value,
+                    birthday: document.getElementById('birthday').value,
+                    className: document.getElementById('className').value,
+                    khoa: document.getElementById('khoa').value,
+                };
+
+                // Gửi yêu cầu PUT để cập nhật dữ liệu nhân viên
+                fetch(`http://localhost:8080/api/students/${employeeId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedEmployee), // Chuyển đổi đối tượng sang chuỗi JSON
+                })
+                    .then((response) => {
+                        if (!response.ok) {
+                            return response.json().then((errorData) => {
+                                // Hiển thị thông báo lỗi
+                                document.getElementById('error-message').textContent =
+                                    errorData.details + '\n' + errorData.message;
+                                throw new Error(errorData.details + '\n' + errorData.message);
+                            });
+                        }
+                        return response.json(); // Chuyển đổi dữ liệu sang định dạng JSON
+                    })
+                    .then(() => {
+                        // Chuyển hướng về trang chính sau khi cập nhật thành công
+                        window.location.href = 'app.html?success=edit';
+                    })
+                    .catch((error) => {
+                        // Hiển thị thông báo lỗi nếu có
+                        document.getElementById('error-message').textContent =
+                            error.message;
+                    });
+            });
+    </script>
+</body>
+
+</html>

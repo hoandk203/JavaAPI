@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Store</title>
+  </head>
+  <body>
+    <div style="text-align: center; margin-top: 10em">
+      <div>
+        <h1>Book Store</h1>
+      </div>
+      <!-- Khối chứa thông báo thành công -->
+      <div
+        id="alertContainer"
+        style="
+          display: none;
+          text-align: center;
+          padding: 10px;
+          border-radius: 5px;
+          margin-bottom: 20px;
+        "
+      ></div>
+      <div>
+        <input id="searchkeyword" type="text" name="search" />
+        <button onclick="fetchSearch()">Tim kiem</button>
+      </div>
+      <div>
+        <a
+          style="
+            display: inline-block;
+            padding: 10px;
+            text-decoration: none;
+            background-color: antiquewhite;
+          "
+          href="add.html"
+          >Them</a
+        >
+      </div>
+
+      <div>
+        <table
+          id="tableId"
+          style="
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid black;
+          "
+        >
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>Tiêu đề</th>
+              <th>Tác giả</th>
+              <th>Ngày xuất bản</th>
+              <th>Giá tiền</th>
+              <th>Số lượng</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Hien thi du lieu  -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+  <script src="app.js"></script>
+  <script>
+    // Kiểm tra xem có thông báo thành công trong URL không
+    const urlParams = new URLSearchParams(window.location.search); // Lấy các tham số từ URL
+    const successMessage = urlParams.get('success'); // Lấy giá trị của tham số 'success'
+    const alertContainer = document.getElementById('alertContainer'); // Lấy phần tử chứa thông báo thành công
+
+    // Định nghĩa thông báo cho mỗi hành động
+    const messages = {
+      add: 'Thêm thành công!', // Thông báo khi thêm nhân viên thành công
+      edit: 'Cập nhật thành công!', // Thông báo khi cập nhật thông tin nhân viên thành công
+      delete: 'Xóa thành công!', // Thông báo khi xóa nhân viên thành công
+    };
+
+    // Hiển thị thông báo nếu tham số success tồn tại
+    if (successMessage && messages[successMessage]) {
+      alertContainer.style.display = 'block'; // Hiện khối thông báo
+      alertContainer.textContent = messages[successMessage]; // Đặt thông điệp vào khối thông báo
+      alertContainer.style.backgroundColor = 'lightgreen'; // Màu nền cho khối thông báo
+      alertContainer.style.color = 'green'; // Màu chữ cho khối thông báo
+    }
+  </script>
+</html>
